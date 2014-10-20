@@ -6,8 +6,6 @@ package name.kingbright.group;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.alljoyn.bus.BusObject;
-
 import name.kingbright.base.Observable;
 import name.kingbright.base.Observer;
 
@@ -179,7 +177,7 @@ public abstract class Group implements Observable<Group> {
      * 
      * @param groupId
      */
-    public void createCommunicationInterface(BusObject communicationObject) {
+    public void createCommunicationInterface(Object communicationObject) {
         if (mSessionId <= 0) {
             throw new RuntimeException("Sesssion id is not valid : " + mSessionId);
         }
@@ -196,7 +194,7 @@ public abstract class Group implements Observable<Group> {
      * @param name
      * @return
      */
-    public GroupCommunicationInterface getPeerToPeerCommunicationInterface(BusObject communicationObject, String name) {
+    public GroupCommunicationInterface getPeerToPeerCommunicationInterface(Object communicationObject, String name) {
         if (mSessionId <= 0) {
             throw new RuntimeException("Sesssion id is not valid : " + mSessionId);
         }
@@ -211,10 +209,10 @@ public abstract class Group implements Observable<Group> {
         return communicationInterface;
     }
 
-    protected abstract GroupCommunicationInterface onCreatePeerToPeerCommunicationInterface(
-            BusObject communicationObejct, int sessionId, String name);
+    protected abstract GroupCommunicationInterface onCreatePeerToPeerCommunicationInterface(Object communicationObejct,
+            int sessionId, String name);
 
-    protected abstract GroupCommunicationInterface onCreateCommunicationInterface(BusObject communicationObject,
+    protected abstract GroupCommunicationInterface onCreateCommunicationInterface(Object communicationObject,
             int sessionId);
 
     protected abstract GroupMember onCreateGroupMember(String name, int sessionId, short transport);

@@ -3,12 +3,12 @@
  */
 package name.kingbright.alljoyn;
 
-import org.alljoyn.bus.BusObject;
-import org.alljoyn.bus.SignalEmitter;
-
 import name.kingbright.group.Group;
 import name.kingbright.group.GroupCommunicationInterface;
 import name.kingbright.group.GroupMember;
+
+import org.alljoyn.bus.BusObject;
+import org.alljoyn.bus.SignalEmitter;
 
 /**
  * @author KingBright
@@ -21,18 +21,19 @@ public class AllJoynGroup extends Group {
     }
 
     @Override
-    protected GroupCommunicationInterface onCreateCommunicationInterface(BusObject communicationObject, int sessionId) {
-        SignalEmitter emitter = new SignalEmitter(communicationObject, sessionId, SignalEmitter.GlobalBroadcast.Off);
+    protected GroupCommunicationInterface onCreateCommunicationInterface(Object communicationObject, int sessionId) {
+        SignalEmitter emitter =
+                new SignalEmitter((BusObject) communicationObject, sessionId, SignalEmitter.GlobalBroadcast.Off);
         AllJoynCommunicationInterface communicationInterface =
                 emitter.getInterface(AllJoynCommunicationInterface.class);
         return communicationInterface;
     }
 
     @Override
-    protected GroupCommunicationInterface onCreatePeerToPeerCommunicationInterface(BusObject communicationObject,
+    protected GroupCommunicationInterface onCreatePeerToPeerCommunicationInterface(Object communicationObject,
             int sessionId, String name) {
         SignalEmitter emitter =
-                new SignalEmitter(communicationObject, name, sessionId, SignalEmitter.GlobalBroadcast.Off);
+                new SignalEmitter((BusObject) communicationObject, name, sessionId, SignalEmitter.GlobalBroadcast.Off);
         AllJoynCommunicationInterface communicationInterface =
                 emitter.getInterface(AllJoynCommunicationInterface.class);
         return communicationInterface;

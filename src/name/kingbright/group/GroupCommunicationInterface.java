@@ -3,7 +3,6 @@
  */
 package name.kingbright.group;
 
-import org.alljoyn.bus.BusObject;
 import org.alljoyn.bus.annotation.BusInterface;
 import org.alljoyn.bus.annotation.BusSignal;
 
@@ -12,7 +11,7 @@ import org.alljoyn.bus.annotation.BusSignal;
  * 
  */
 @BusInterface(name = "name.kingbright.communication.service")
-public interface GroupCommunicationInterface extends BusObject {
+public interface GroupCommunicationInterface {
     @BusSignal
     public void sendMessage(String string) throws Exception;
 }

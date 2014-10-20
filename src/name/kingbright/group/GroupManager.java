@@ -75,8 +75,18 @@ public class GroupManager implements Observable<GroupManager> {
     /**
      * @param groupName
      */
-    public Group getJoinedGroup(Integer sessionId) {
-        return mJoinedGroups.get(sessionId);
+    public Group getJoinedGroup(String name) {
+        return mJoinedGroups.get(name);
+    }
+
+    public Group getJoinedGroup(int sessionId) {
+        Collection<Group> groups = mJoinedGroups.values();
+        for (Group g : groups) {
+            if (g.getSessionId() == sessionId) {
+                return g;
+            }
+        }
+        return null;
     }
 
     public Group getPendingGroup(String name) {

@@ -92,14 +92,10 @@ public class AllJoynGroupService implements GroupService {
     private BackgroundHandler mBackgroundHandler;
 
     /**
-     * TODO modify to support multiple interfaces.
-     */
-    private AllJoynCommunicationInterface mHostChatInterface = null;
-    /**
      * The CommunicationService is the instance of an AllJoyn interface that is exported on the bus and allows us to
      * send signals implementing messages
      */
-    private GroupCommunicationInterface mCommunicationObject = new CommunicationService();
+    private CommunicationService mCommunicationObject = new CommunicationService();
 
     /**
      * A wrapper of group list and some useful methods for groups.
@@ -172,6 +168,10 @@ public class AllJoynGroupService implements GroupService {
     public void onMemberJoin(int sessionId, String name, short transport) {
         notify("onMemberJoin", name + "(" + sessionId + ") joins. Port : " + transport);
         Group group = mGroupManager.getJoinedGroup(sessionId);
+        if (group == null) {
+            notify("NoSuchGroup", "no such group (" + name + ")");
+            return;
+        }
         group.addGroupMember(name, sessionId, transport);
         if (!group.hasCommunicationInterface()) {
             group.createCommunicationInterface(mCommunicationObject);
@@ -182,6 +182,10 @@ public class AllJoynGroupService implements GroupService {
     public void onMemberLeave(int sessionId, String name, short transport) {
         notify("onMemberLeave", name + "(" + sessionId + ") leaves. Port : " + transport);
         Group group = mGroupManager.getJoinedGroup(sessionId);
+        if (group == null) {
+            notify("NoSuchGroup", "no such group (" + name + ")");
+            return;
+        }
         group.removeMember(name, sessionId, transport);
     }
 
@@ -189,6 +193,10 @@ public class AllJoynGroupService implements GroupService {
     public void onMessageReceive(int sessionId, String sender, String message) {
         notify("onMessageReceive", "From " + sender + "(" + sessionId + ") : " + message);
         Group group = mGroupManager.getJoinedGroup(sessionId);
+        if (group == null) {
+            notify("NoSuchGroup", "no such group");
+            return;
+        }
         group.dispatchMessage(sessionId, sender, message);
     }
 
@@ -209,6 +217,7 @@ public class AllJoynGroupService implements GroupService {
         notify("leaveGroup", "Leave group " + groupName);
         int id = mGroupManager.getJoinedGroupId(mApplicationNameSpace + "." + groupName);
         if (id == 0) {
+            notify("NoSuchGroup", "no such group");
             return;
         }
         mBackgroundHandler.leaveGroup(id);
@@ -493,18 +502,26 @@ public class AllJoynGroupService implements GroupService {
     private void doLeaveGroup(int sessionId) {
         Status status = mBusAttachment.leaveSession(sessionId);
         if (status == Status.OK) {
-
+            notify("doCancelAdvertise", "OK");
+        } else {
+            notify("doCancelAdvertise", status);
         }
     }
 
-    private void doSendMessages(String groupId, String message) {
+    private void doSendMessages(String groupName, String message) {
         try {
-            // TODO Select the right group from GroupManager to send message.
-            if (mHostChatInterface != null) {
-                mHostChatInterface.sendMessage(message);
+            Group group = mGroupManager.getJoinedGroup(groupName);
+            if (group == null) {
+                notify("NoSuchGroup", "no such group (" + groupName + ")");
+                return;
             }
-        } catch (BusException ex) {
-            notify("doSendMessages", "");
+            GroupCommunicationInterface communicationInterface = group.getCommunicationInterface();
+            if (communicationInterface != null) {
+                communicationInterface.sendMessage(message);
+            }
+        } catch (Exception e) {
+            notify("doSendMessages", e.getMessage());
+            e.printStackTrace();
         }
     }
 
